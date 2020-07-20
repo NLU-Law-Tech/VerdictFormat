@@ -8,11 +8,11 @@
 把正式格式轉成測試格式
 ```python
 from VerdictFormat import Formal_to_Test
-Formal_to_Test(Formal_format,output_path)
+Formal_to_Test(Formal_format_path,output_path)
 ```
 
 把測試格式轉成正式格式
 ```python
 from VerdictFormat import Test_to_Formal
-Test_to_Formal(Test_format,output_path)
+Test_to_Formal(Test_format_path,output_path)
 ```

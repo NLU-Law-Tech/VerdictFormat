@@ -1,11 +1,14 @@
 import json
 import re
 
-def Formal_to_Test(Formal_format,output_path):
+def Formal_to_Test(Formal_format_path,output_path):
+    # 讀檔
+    with open(Formal_format_path,'r',encoding='utf-8') as f:
+        Formal_format=json.load(f)
+
     output_dict={}
     outputs_dict_list=[]
     for index,Formal_dict in enumerate(Formal_format):
-
         content_id=""
         name=Formal_dict["name"]
         job_location_list,job_title_list=get_job_location_and_title(Formal_dict["positions"])
@@ -18,10 +21,14 @@ def Formal_to_Test(Formal_format,output_path):
         output_dict["laws"]=laws_list
         outputs_dict_list.append(output_dict.copy())
         output_dict.clear()
-    with open(path,"w",encoding="utf-8") as file:
+    with open(output_path,"w",encoding="utf-8") as file:
         json.dump(outputs_dict_list,file,ensure_ascii=False)
 
-def Test_to_Formal(Test_format,output_path):
+def Test_to_Formal(Test_format_path,output_path):
+
+    with open(Test_format_path,'r',encoding='utf-8') as f:
+        Test_format=json.load(f)
+
     output_dict={}
     outputs_dict_list=[]
     for index,content_dict in enumerate(Test_format):
@@ -30,9 +37,7 @@ def Test_to_Formal(Test_format,output_path):
         name=content_dict["name"]
         job_location_list=content_dict["job_location"]
         job_title_list=content_dict["job_title"]
-        laws_list=content_dict["laws"]
-            
-            
+        laws_list=content_dict["laws"]        
         # 開始建立正式的格式
     
         # 先建立 positions 這個字典
@@ -49,7 +54,7 @@ def Test_to_Formal(Test_format,output_path):
         outputs_dict_list.append(output_dict.copy())
         output_dict.clear()
 
-    with open(path,"w",encoding="utf-8") as file:
+    with open(output_path,"w",encoding="utf-8") as file:
         json.dump(outputs_dict_list,file,ensure_ascii=False)
 
 def get_posistions_dict(job_location_list,job_title_list):
@@ -206,4 +211,4 @@ if __name__ == "__main__":
     # print(Formal_format)
     # print(Test_format)
     # Test_to_Formal(Test_format,Test_to_Formal_path)
-    Formal_to_Test(Formal_format,Formal_to_Test_path)
+    # Formal_to_Test(Formal_format,Formal_to_Test_path)

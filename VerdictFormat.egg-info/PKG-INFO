@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: VerdictFormat
-Version: 1.0
+Version: 1.3.2
 Summary: To format verdict
 Home-page: https://github.com/Josiriser/VerdictFormat
 Author: Josiriser
@@ -8,6 +8,22 @@ Author-email: josiriser@gmail.com
 License: UNKNOWN
 Description: # 判決書格式轉換
         ## 使用方法
+        安裝套件
+        `
+            pip install VerdictFormat
+        `
+        
+        把正式格式轉成測試格式
+        ```python
+        from VerdictFormat import Formal_to_Test
+        Formal_to_Test(Formal_format_path,output_path)
+        ```
+        
+        把測試格式轉成正式格式
+        ```python
+        from VerdictFormat import Test_to_Formal
+        Test_to_Formal(Test_format_path,output_path)
+        ```
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License

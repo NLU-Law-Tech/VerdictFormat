@@ -8,7 +8,7 @@ with open("Discription.md", "r",encoding="utf-8") as fh:
 
 setuptools.setup(
     name="VerdictFormat", # 
-    version='1.0',
+    version='1.3.2',
     author="Josiriser",
     author_email="josiriser@gmail.com",
     description="To format verdict",
