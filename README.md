@@ -19,6 +19,7 @@ Test_to_Formal(Test_format_path,output_path)
 
 Formal Format
 ```python
+[
 {
     "name": "姓名",
     "statuses": [
@@ -75,4 +76,25 @@ Formal Format
         } 
       ]  
   }
+]
+
   ```
+
+Test Format
+```python
+[
+{
+		"content_id" : "1" ,
+		"name" : "柯森" ,
+		"job_location" : [] ,
+		"job_title" : [] ,
+		"laws" : ["中華民國刑法第276條第1項","中華民國刑法第140條"]
+    },{
+		"content_id" : "2" ,
+		"name" : "吳柯森" ,
+		"job_location" : ["停車場"] ,
+		"job_title" : ["管理員"] ,
+		"laws" : ["中華民國刑法第276條第1項","中華民國刑法第140條"]
+    }
+]
+```
