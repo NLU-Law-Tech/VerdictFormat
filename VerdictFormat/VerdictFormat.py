@@ -83,6 +83,22 @@ def Labeled_to_Test(Labeled_data):
         output_dict.clear()
     return output_dict_list
 
+def Multilaws_to_Normalize(Multilaws,break_line="\r\n"):
+    Normalized_laws_list=[]
+    # 資料清洗
+    clean_Multilaws=re.sub(break_line,"",strip_blank(Multilaws))
+    # 先找出法律名稱
+    laws_name=get_laws_name(clean_Multilaws)
+    # 頓號隔開第幾條
+    temp_list=clean_Multilaws.split("、")
+    for i in range(len(temp_list)):
+        #第一項通常會寫完整(包含法律名稱跟第幾條)
+        if i==0:
+            Normalized_laws_list.append(temp_list[i])
+        else:
+            Normalized_laws_list.append(laws_name+temp_list[i])
+    return Normalized_laws_list
+
 def get_posistions_dict(job_location_list,job_title_list):
 
     posistions_dict={} 
@@ -228,12 +244,23 @@ def get_laws_list(laws_dict):
 def extract_content_from_dict(content_dict_list):
     content_list=[]
     for i in content_dict_list:
-        content_list.append(clean_string(i["content"]))
+        content_list.append(strip_blank(i["content"]))
     return content_list
-def clean_string(dirty_str):
+
+def strip_blank(dirty_str):
     # 去空白
     clean_str=re.sub(r"\s+","",dirty_str)
     return clean_str
+
+def get_laws_name(laws):
+    result=laws
+    # 找第一個 "第"  這個字前面的法律名稱
+    laws_name_position=re.search("第",laws)
+    if laws_name_position!= None:
+        result=laws[:laws_name_position.end()-1]
+
+    return result
+
 if __name__ == "__main__":
     # Formal_file_path="C:/Yao/ITRI/API (1)/output_v2.json"
     # Test_file_path="C:/Yao/ITRI/API (1)/Test.json"
@@ -247,9 +274,12 @@ if __name__ == "__main__":
     # print(Test_format)
     # Test_to_Formal(Test_format,Test_to_Formal_path)
     # Formal_to_Test(Formal_format,Formal_to_Test_path)
-    response_data = requests.get("http://140.120.13.242:15005/dump_labeled_data")
-    labeled_data=response_data.json()
-    print(Labeled_to_Test(labeled_data))
+
+    # response_data = requests.get("http://140.120.13.242:15005/dump_labeled_data")
+    # labeled_data=response_data.json()
+    # print(Labeled_to_Test(labeled_data))
   
-        # print(json(i['laws']))
-    # print(list_of_dicts)
+    # Multilaws="貪汙治罪條\r\n例第五條、第\r\n八條"
+    Multilaws="貪汙治罪條\\r\\n例第五條、第\r\n八條\\r\\n第五項第六款、第 \r\n 十 \\r\\n 條第六項第七款"
+    Normalized_laws_list=Multilaws_to_Normalize(Multilaws,"\\\\r\\\\n")
+    print(Normalized_laws_list)

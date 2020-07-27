@@ -23,6 +23,12 @@ from VerdictFormat import Labeled_to_Test
 Labeled_to_Test(Labeled_data)
 ```
 
+正規化多個法條
+```python
+from VerdictFormat import Multilaws_to_Normalize
+Multilaws_to_Normalize(Multilaws,breakline)
+```
+
 Formal Format
 ```python
 [
@@ -103,4 +109,13 @@ Test Format
 		"laws" : ["中華民國刑法第276條第1項","中華民國刑法第140條"]
     }
 ]
+```
+
+Multilaws Normalize
+```python
+
+Multilaws="貪汙治罪條\\r\\n例第五條、第\r\n八條\\r\\n第五項第六款、第 \r\n 十 \\r\\n 條第六項第七款"
+Normalized_laws_list=['貪汙治罪條例第五條', '貪汙治罪條例第八條第五項第六款', '貪汙治罪條例第十條第六項第七款']
+
+
 ```
