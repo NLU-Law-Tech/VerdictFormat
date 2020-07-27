@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: VerdictFormat
-Version: 1.3.3
+Version: 1.4.0
 Summary: To format verdict
 Home-page: https://github.com/Josiriser/VerdictFormat
 Author: Josiriser
@@ -23,6 +23,12 @@ Description: # 判決書格式轉換
         ```python
         from VerdictFormat import Test_to_Formal
         Test_to_Formal(Test_format_path,output_path)
+        ```
+        
+        把標記好的格式轉成測試格式
+        ```python
+        from VerdictFormat import Labeled_to_Test
+        Labeled_to_Test(Labeled_data)
         ```
         
         Formal Format

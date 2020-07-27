@@ -17,6 +17,13 @@ from VerdictFormat import Test_to_Formal
 Test_to_Formal(Test_format_path,output_path)
 ```
 
+把標記好的格式轉成測試格式
+```python
+from VerdictFormat import Labeled_to_Test
+Labeled_to_Test(Labeled_data)
+```
+
+
 Formal Format
 ```python
 [

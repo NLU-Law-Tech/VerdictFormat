@@ -1,6 +1,8 @@
 import json
 import re
 
+import requests
+
 def Formal_to_Test(Formal_format_path,output_path):
     # 讀檔
     with open(Formal_format_path,'r',encoding='utf-8') as f:
@@ -56,6 +58,30 @@ def Test_to_Formal(Test_format_path,output_path):
 
     with open(output_path,"w",encoding="utf-8") as file:
         json.dump(outputs_dict_list,file,ensure_ascii=False)
+
+def Labeled_to_Test(Labeled_data):
+    output_dict={}
+    output_dict_list=[]
+    for index,each_verdict in enumerate(Labeled_data):
+        # 讀值
+        doc_id=each_verdict["doc_id"]
+        identities_list=extract_content_from_dict(json.loads(each_verdict["identities"]))
+        laws_list=extract_content_from_dict(json.loads(each_verdict["laws"]))
+        name=json.loads(each_verdict["name"])["content"]
+        positions_list=extract_content_from_dict(json.loads(each_verdict["positions"]))
+        units_list=extract_content_from_dict(json.loads(each_verdict["units"]))
+
+
+        # 開始轉格式
+        output_dict["content_id"]=doc_id
+        output_dict["name"]=name
+        output_dict["job_location"]=units_list
+        output_dict["job_title"]=positions_list
+        output_dict["laws"]=laws_list
+        
+        output_dict_list.append(output_dict.copy())
+        output_dict.clear()
+    return output_dict_list
 
 def get_posistions_dict(job_location_list,job_title_list):
 
@@ -199,16 +225,31 @@ def get_laws_list(laws_dict):
         laws_list.append(law)
     return laws_list
 
+def extract_content_from_dict(content_dict_list):
+    content_list=[]
+    for i in content_dict_list:
+        content_list.append(clean_string(i["content"]))
+    return content_list
+def clean_string(dirty_str):
+    # 去空白
+    clean_str=re.sub(r"\s+","",dirty_str)
+    return clean_str
 if __name__ == "__main__":
-    Formal_file_path="C:/Yao/ITRI/API (1)/output_v2.json"
-    Test_file_path="C:/Yao/ITRI/API (1)/Test.json"
-    Test_to_Formal_path="C:/Yao/ITRI/API (1)/Test_Formal.json"
-    Formal_to_Test_path="C:/Yao/ITRI/API (1)/Formal_Test.json"
-    with open(Formal_file_path,'r',encoding='utf-8') as f:
-        Formal_format=json.load(f)
-    with open(Test_file_path,'r',encoding='utf-8') as f:
-        Test_format=json.load(f)
+    # Formal_file_path="C:/Yao/ITRI/API (1)/output_v2.json"
+    # Test_file_path="C:/Yao/ITRI/API (1)/Test.json"
+    # Test_to_Formal_path="C:/Yao/ITRI/API (1)/Test_Formal.json"
+    # Formal_to_Test_path="C:/Yao/ITRI/API (1)/Formal_Test.json"
+    # with open(Formal_file_path,'r',encoding='utf-8') as f:
+    #     Formal_format=json.load(f)
+    # with open(Test_file_path,'r',encoding='utf-8') as f:
+    #     Test_format=json.load(f)
     # print(Formal_format)
     # print(Test_format)
     # Test_to_Formal(Test_format,Test_to_Formal_path)
     # Formal_to_Test(Formal_format,Formal_to_Test_path)
+    response_data = requests.get("http://140.120.13.242:15005/dump_labeled_data")
+    labeled_data=response_data.json()
+    print(Labeled_to_Test(labeled_data))
+  
+        # print(json(i['laws']))
+    # print(list_of_dicts)
