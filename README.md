@@ -26,7 +26,10 @@ Labeled_to_Test(Labeled_data)
 正規化多個法條
 ```python
 from VerdictFormat import Multilaws_to_Normalize
-Multilaws_to_Normalize(Multilaws,breakline)
+Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
+CJ_text : 判決書全文
+Match_laws_list : 執掌法條清單
+Multilaws_dict_list : 要正規化的法條
 ```
 
 Formal Format
@@ -114,8 +117,13 @@ Test Format
 Multilaws Normalize
 ```python
 
-Multilaws="貪汙治罪條\\r\\n例第五條、第\r\n八條\\r\\n第五項第六款、第 \r\n 十 \\r\\n 條第六項第七款"
-Normalized_laws_list=['貪汙治罪條例第五條', '貪汙治罪條例第八條第五項第六款', '貪汙治罪條例第十條第六項第七款']
-
+Multilaws_dict_list=[
+        {"start": 2933, "content": "毒品危害防制條例第11條"},
+        {"start": 2946, "content": "第13條"},
+        {"start": 2951, "content": "第15\r\n條"},
+        {"start": 3315, "content": "貪污治罪條例第11條"},
+        {"start": 3326, "content": "第133333條第8項\r\n第6款"},
+    ]
+Normalized_laws_list=['毒品危害防制條例第11條', '毒品危害防制條例第13條', '毒品危害防制條例第15條', '貪污治罪條例第11條', '貪污治罪條例第133333條第8項第6款']
 
 ```

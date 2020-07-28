@@ -26,7 +26,10 @@ Labeled_to_Test(Labeled_data)
 正規化多個法條
 ```python
 from VerdictFormat import Multilaws_to_Normalize
-Multilaws_to_Normalize(Multilaws,breakline)
+Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
+CJ_text : 判決書全文
+Match_laws_list : 執掌法條清單
+Multilaws_dict_list : 要正規化的法條
 ```
 
 Formal Format
