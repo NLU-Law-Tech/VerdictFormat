@@ -264,6 +264,8 @@ def strip_blank(dirty_str):
 def get_laws_name(laws,origin_start,CJ_text,Match_laws_list):
     laws_name_dict_list=[]
     laws_name_dict={}
+    # 先初始化
+    laws_name_dict["law"]=""
     for law in Match_laws_list:
         # 先找該法律名稱是否有在CJ_text
         if re.search(law,CJ_text)==None:
