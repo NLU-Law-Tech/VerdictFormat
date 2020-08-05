@@ -87,8 +87,8 @@ def Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list,Break_lin
     for Multilaws_dict in Multilaws_dict_list:
         content=Multilaws_dict["content"]
         start=Multilaws_dict["start"]
-         # 先找出法律名稱
-        laws_name=get_laws_name(content,start,CJ_text,Match_laws_list)
+        # 先找出法律名稱
+        laws_name=get_laws_name(content,start,CJ_text,Match_laws_list,Break_line)
         # 資料清洗
         clean_Multilaws=re.sub(Break_line,"",strip_blank(content))
         # 取出第幾條第幾項第幾款,act則用 laws_name代替
@@ -261,17 +261,22 @@ def strip_blank(dirty_str):
     clean_str=re.sub(r"\s+","",dirty_str)
     return clean_str
 
-def get_laws_name(laws,origin_start,CJ_text,Match_laws_list):
+def get_laws_name(laws,origin_start,CJ_text,Match_laws_list,Break_line):
     laws_name_dict_list=[]
     laws_name_dict={}
     # 先初始化
     laws_name_dict["law"]=""
+    laws_name_dict["distance"]=99999999999
     for law in Match_laws_list:
         # 先找該法律名稱是否有在CJ_text
         if re.search(law,CJ_text)==None:
             continue
         else:
-            # 如果有則找出所有位置
+            # 如果所標記的法律已經含有 執掌法條  就直接return
+            clean_laws=re.sub(Break_line,"",strip_blank(laws))
+            if re.search(law,clean_laws) != None:
+                return law
+            # 找出所有位置
             all_match_positions=re.finditer(law,CJ_text)
             if len(laws_name_dict)==0:
                 distance=99999999999
@@ -305,13 +310,14 @@ if __name__ == "__main__":
     # labeled_data=response_data.json()
     # print(Labeled_to_Test(labeled_data))
   
-    Multilaws_dict_list=[
-        {"start": 2933, "content": "毒品危害防制條例第11條"},
-        {"start": 2946, "content": "第13條"},
-        {"start": 2951, "content": "第15\r\n條"},
-        {"start": 3315, "content": "貪污治罪條例第11條"},
-        {"start": 3326, "content": "第133333條第8項\r\n第6款"},
-    ]
+    # Multilaws_dict_list=[
+    #     {"start": 2933, "content": "毒品危害防制條例第11條"},
+    #     {"start": 2946, "content": "第13條"},
+    #     {"start": 2951, "content": "第15\r\n條"},
+    #     {"start": 3315, "content": "貪污治罪條例第11條"},
+    #     {"start": 3326, "content": "第133333條第8項\r\n第6款"},
+    # ]
+    Multilaws_dict_list=[{'end': 37334, 'start': 37320, 'content': '\r\n中華民國刑法第158條'}, {'end': 37410, 'start': 37398, 'content': '中華民國刑法第216條'}, {'end': 37480, 'start': 37468, 'content': '中華民國刑法第211條'}, {'end': 37538, 'start': 37526, 'content': '中華民國刑法第212條'}, {'end': 37637, 'start': 37625, 'content': '中華民國刑法第339條'}]
     Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
                     '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
                     '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
@@ -333,9 +339,13 @@ if __name__ == "__main__":
                     '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
                     '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法']
     
-    file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30daa0cbd1c48dc9762e8f_2.json"
+    file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db00cbd1c48dc9787708.txt"
     with open(file_path,'r',encoding='utf-8') as f:
         full_text=json.load(f)
     CJ_text=full_text["judgement"]
+    # test_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db00cbd1c48dc9787708_1.txt"
+    # f = open(test_path,'w',encoding='utf-8')
+    # f.writelines(full_text["judgement"])
+    # print(CJ_text)
     Normalized_laws_list=Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
     print(Normalized_laws_list)
