@@ -89,6 +89,14 @@ def Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list,Break_lin
         start=Multilaws_dict["start"]
         # 先找出法律名稱
         laws_name=get_laws_name(content,start,CJ_text,Match_laws_list,Break_line)
+        # content 清洗
+        # content=re.sub(Break_line,"",strip_blank(content))5
+        # 判斷是否有法律名稱跟條是否包含在content
+        regex_article="第\d*.*條"
+        laws_name_article_position=re.search(laws_name+regex_article,content)
+        # 若是沒有，往前找
+        if laws_name_article_position==None:
+            content=get_laws_name_and_article(content,start,CJ_text,laws_name+regex_article,Break_line)
         # 資料清洗
         clean_Multilaws=re.sub(Break_line,"",strip_blank(content))
         # 取出第幾條第幾項第幾款,act則用 laws_name代替
@@ -323,6 +331,53 @@ def get_laws_name(laws,origin_start,CJ_text,Match_laws_list,Break_line):
                     laws_name_dict["distance"]=distance
     return laws_name_dict["law"]
 
+def get_laws_name_and_article(laws,origin_start,CJ_text,laws_name_article_regx,Break_line):
+    laws_name_dict_list=[]
+    laws_name_dict={}
+    # 先初始化
+    laws_name_dict["law"]=""
+    laws_name_dict["distance"]=99999999999
+    # 找出所有位置
+    all_match_positions=re.finditer(laws_name_article_regx,CJ_text)
+    if len(laws_name_dict)==0:
+        distance=99999999999
+    else:
+        distance=laws_name_dict["distance"]
+    for match_position in all_match_positions:  
+        # 計算距離多遠  並且法律名稱要在 origin_start 前面
+        print(match_position.group(),match_position.start())
+        temp_distance= origin_start-match_position.start()
+        # 要找跟laws最接近的位置
+        if temp_distance < distance and temp_distance >=0 :
+            distance=temp_distance
+            laws_name_dict["law"]=match_position.group()+laws
+            laws_name_dict["distance"]=distance
+    # for law in Match_laws_list:
+    #     # 先找該法律名稱是否有在CJ_text
+    #     if re.search(law,CJ_text)==None:
+    #         continue
+    #     else:
+    #         # 如果所標記的法律已經含有 執掌法條  就直接return
+    #         clean_laws=re.sub(Break_line,"",strip_blank(laws))
+    #         if re.search(law,clean_laws) != None:
+    #             return law
+    #         # 找出所有位置
+    #         all_match_positions=re.finditer(law,CJ_text)
+    #         if len(laws_name_dict)==0:
+    #             distance=99999999999
+    #         else:
+    #             distance=laws_name_dict["distance"]
+    #         for match_position in all_match_positions:  
+    #             # 計算距離多遠  並且法律名稱要在 origin_start 前面
+    #             temp_distance= origin_start-match_position.start()
+    #             # 要找跟laws最接近的位置
+    #             if temp_distance < distance and temp_distance >=0 :
+    #                 distance=temp_distance
+    #                 laws_name_dict["law"]=law
+    #                 laws_name_dict["distance"]=distance
+    return laws_name_dict["law"]
+
+
 if __name__ == "__main__":
     # Formal_file_path="C:/Yao/ITRI/API (1)/output_v2.json"
     # Test_file_path="C:/Yao/ITRI/API (1)/Test.json"
@@ -348,8 +403,8 @@ if __name__ == "__main__":
     #     {"start": 3315, "content": "貪污治罪條例第11條"},
     #     {"start": 3326, "content": "第133333條第8項\r\n第6款"},
     # ]
-    Multilaws_dict_list={"end": 6738, "start": 6728, "content": "刑法第三百三十九條之四"}, {"end": 6889, "start": 6882, "content": "洗錢防制法第二條"}, {"end": 7037, "start": 7029, "content": "洗錢防制法第十四條"}
-   
+    # Multilaws_dict_list={"end": 6738, "start": 6728, "content": "刑法第三百三十九條之四"}, {"end": 6889, "start": 6882, "content": "洗錢防制法第二條"}, {"end": 7037, "start": 7029, "content": "洗錢防制法第十四條"}
+    Multilaws_dict_list=[{"end": 2293, "start": 2282, "content": "刑法第320 條第1 項"}, {"end": 2329, "start": 2318, "content": "刑法第325 條第1 項"}, {"end": 2334, "start": 2256, "content": "第3 項"}, {"end": 2405, "start": 2396, "content": "刑法第185 條之4"}]
     Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
                     '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
                     '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
@@ -371,7 +426,7 @@ if __name__ == "__main__":
                     '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
                     '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法','刑法']
     
-    file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db5bcbd1c48dc9794cb0.txt"
+    file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30daa1cbd1c48dc9763831.txt"
     with open(file_path,'r',encoding='utf-8') as f:
         # full_text=json.load(f)
         full_text=f.read()

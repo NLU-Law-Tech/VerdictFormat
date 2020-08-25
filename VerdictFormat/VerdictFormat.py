@@ -345,36 +345,13 @@ def get_laws_name_and_article(laws,origin_start,CJ_text,laws_name_article_regx,B
         distance=laws_name_dict["distance"]
     for match_position in all_match_positions:  
         # 計算距離多遠  並且法律名稱要在 origin_start 前面
-        print(match_position.group(),match_position.start())
+        # print(match_position.group(),match_position.start())
         temp_distance= origin_start-match_position.start()
         # 要找跟laws最接近的位置
         if temp_distance < distance and temp_distance >=0 :
             distance=temp_distance
             laws_name_dict["law"]=match_position.group()+laws
             laws_name_dict["distance"]=distance
-    # for law in Match_laws_list:
-    #     # 先找該法律名稱是否有在CJ_text
-    #     if re.search(law,CJ_text)==None:
-    #         continue
-    #     else:
-    #         # 如果所標記的法律已經含有 執掌法條  就直接return
-    #         clean_laws=re.sub(Break_line,"",strip_blank(laws))
-    #         if re.search(law,clean_laws) != None:
-    #             return law
-    #         # 找出所有位置
-    #         all_match_positions=re.finditer(law,CJ_text)
-    #         if len(laws_name_dict)==0:
-    #             distance=99999999999
-    #         else:
-    #             distance=laws_name_dict["distance"]
-    #         for match_position in all_match_positions:  
-    #             # 計算距離多遠  並且法律名稱要在 origin_start 前面
-    #             temp_distance= origin_start-match_position.start()
-    #             # 要找跟laws最接近的位置
-    #             if temp_distance < distance and temp_distance >=0 :
-    #                 distance=temp_distance
-    #                 laws_name_dict["law"]=law
-    #                 laws_name_dict["distance"]=distance
     return laws_name_dict["law"]
 
 
