@@ -1,7 +1,7 @@
 import json
 import re
 import requests
-
+import cn2an
 def Formal_to_Test(Formal_format_path,output_path):
     # 讀檔
     with open(Formal_format_path,'r',encoding='utf-8') as f:
@@ -194,66 +194,60 @@ def get_laws_dict(laws_list):
     return laws_dict
 
 def extract_laws_spa(law):
+    # 再百跟十之間補上一
+    law=add_chinese_one(law)
     # 取出法條的款項條
-    if re.search("\d",law) !=None:
-        # 用阿拉伯數字寫數字
-        regex_article="第\d*條"
-        regex_paragraph="第\d*項"
-        regex_subparagraph="第\d*款"
-        mode =1
-    else:
-        regex_article="第.*條"
-        regex_paragraph="第.*項"
-        regex_subparagraph="第.*款"
-        mode =2
+    law=cn2an.transform(law, "cn2an")
 
-    if mode ==1:
-        # 假設都沒找到就回傳law
-        act=law
-        article=""
-        paragraph=""
-        subparagraph=""
-        # 找第幾條，有找到再往下找第幾項
-        article_position=re.search(regex_article,law)
-        if article_position != None:
-            # 取出act(法條名稱，不包含條項款)
-            act=law[:article_position.start()]
-            article_text=law[article_position.start():article_position.end()]
-            # 取出數字
-            article=get_laws_number(article_text)
-            # 找第幾項，有找到再往下找第幾款
-            paragraph_position=re.search(regex_paragraph,law)
-            if paragraph_position != None:
-                paragraph_text=law[paragraph_position.start():paragraph_position.end()]
-                paragraph=get_laws_number(paragraph_text)
-                subparagraph_position=re.search(regex_subparagraph,law)
-                if subparagraph_position != None:
-                    subparagraph_text=law[subparagraph_position.start():subparagraph_position.end()]
-                    subparagraph=get_laws_number(subparagraph_text)
-    else:
-        act=law
-        article=""
-        paragraph=""
-        subparagraph=""
-        # 找第幾條，有找到再往下找第幾項
-        article_position=re.search(regex_article,law)
-        if article_position != None:
-            # 取出act(法條名稱，不包含條項款)
-            act=law[:article_position.start()]
-            article_text=law[article_position.start():article_position.end()]
-            # 取出數字
-            article=article_text[1:len(article_text)-1]
-             # 找第幾項，有找到再往下找第幾款
-            paragraph_position=re.search(regex_paragraph,law)
-            if paragraph_position != None:
-                paragraph_text=law[paragraph_position.start():paragraph_position.end()]
-                paragraph=paragraph_text[1:len(paragraph_text)-1]
-                subparagraph_position=re.search(regex_subparagraph,law)
-                if subparagraph_position != None:
-                    subparagraph_text=law[subparagraph_position.start():subparagraph_position.end()]
-                    subparagraph=subparagraph_text[1:len(subparagraph_text)-1]
+    # 用阿拉伯數字寫數字
+    regex_article="第\d*條"
+    regex_paragraph="第\d*項"
+    regex_subparagraph="第\d*款"
+
+
+    # 假設都沒找到就回傳law
+    act=law
+    article=""
+    paragraph=""
+    subparagraph=""
+    # 找第幾條，有找到再往下找第幾項
+    article_position=re.search(regex_article,law)
+    if article_position != None:
+        # 取出act(法條名稱，不包含條項款)
+        act=law[:article_position.start()]
+        article_text=law[article_position.start():article_position.end()]
+        # 取出數字
+        article=get_laws_number(article_text)
+        # 找第幾項，有找到再往下找第幾款
+        paragraph_position=re.search(regex_paragraph,law)
+        if paragraph_position != None:
+            paragraph_text=law[paragraph_position.start():paragraph_position.end()]
+            paragraph=get_laws_number(paragraph_text)
+            subparagraph_position=re.search(regex_subparagraph,law)
+            if subparagraph_position != None:
+                subparagraph_text=law[subparagraph_position.start():subparagraph_position.end()]
+                subparagraph=get_laws_number(subparagraph_text)
+
     return act,article,paragraph,subparagraph
 
+def extract_laws_spa_json(law):
+    act,article,paragraph,subparagraph=extract_laws_spa(law)
+    law_dict={}
+    law_dict["law"]=act
+    if article=="":
+        law_dict["article"]=-1
+    else:
+        law_dict["article"]=article
+    if paragraph=="":
+        law_dict["paragraph"]=-1
+    else:
+        law_dict["paragraph"]=paragraph
+    if subparagraph=="":
+            law_dict["subparagraph"]=-1
+    else:
+        law_dict["subparagraph"]=subparagraph
+    
+    return law_dict
 def get_laws_number(laws_with_number):
     result=""
     for k in laws_with_number:
@@ -354,6 +348,17 @@ def get_laws_name_and_article(laws,origin_start,CJ_text,laws_name_article_regx,B
             laws_name_dict["distance"]=distance
     return laws_name_dict["law"]
 
+def add_chinese_one(law):
+    new_law=""
+    if re.search("百十",law)!=None:
+        for token in law:
+            if token=="百":
+                new_law=new_law+token+"一"
+            else:
+                new_law=new_law+token
+        return new_law
+    else:
+        return law
 
 if __name__ == "__main__":
     # Formal_file_path="C:/Yao/ITRI/API (1)/output_v2.json"
@@ -381,37 +386,40 @@ if __name__ == "__main__":
     #     {"start": 3326, "content": "第133333條第8項\r\n第6款"},
     # ]
     # Multilaws_dict_list={"end": 6738, "start": 6728, "content": "刑法第三百三十九條之四"}, {"end": 6889, "start": 6882, "content": "洗錢防制法第二條"}, {"end": 7037, "start": 7029, "content": "洗錢防制法第十四條"}
-    Multilaws_dict_list=[{"end": 2293, "start": 2282, "content": "刑法第320 條第1 項"}, {"end": 2329, "start": 2318, "content": "刑法第325 條第1 項"}, {"end": 2334, "start": 2256, "content": "第3 項"}, {"end": 2405, "start": 2396, "content": "刑法第185 條之4"}]
-    Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
-                    '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
-                    '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
-                    '山坡地保育利用條例', '公司法', '公民投票法', '公職人員選舉罷免法', 
-                    '水土保持法', '水污染防治法', '水利法', '兒童及少年性交易防制條例', 
-                    '空氣污染防制法', '金融控股公司法', '律師法', '政府採購法', '毒品危害防制條例',
-                    '區域計畫法', '國有財產法', '票券金融管理法', '貪污治罪條例', 
-                    '都市計畫法', '期貨交易法', '森林法', '稅捐稽徵法', '農田水利會組織通則',
-                    '農會法', '農業金融法', '槍砲彈藥刀械管制條例', '漁會法', '銀行法',
-                    '廢棄物清理法', '總統副總統選舉罷免法', '懲治走私條例', '藥事法', '證券交易法', 
-                    '資恐防制法', '畜牧法', '破產法', '商標法', '商業登記法', '光碟管理條例',
-                    '個人資料保護法', '健康食品管理法', '妨害國幣懲治條例', '通訊保障及監察法',
-                    '化粧品衛生管理條例', '金融資產證券化條例', '食品安全衛生管理法',
-                    '動物傳染病防治條例', '多層次傳銷管理法', '商業會計法', '信託業法',
-                    '電信法', '動物用藥品管理法', '消費者債務清理條例', '專利師法',
-                    '傳染病防治法', '嚴重特殊傳染性肺炎防治及紓困振興特別條例',
-                    '農藥管理法', '飼料管理法', '管理外匯條例', '野生動物保育法',
-                    '植物防疫檢疫法', '遺產及贈與稅法', '電子支付機構管理條例', 
-                    '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
-                    '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法','刑法']
+    # Multilaws_dict_list=[{"end": 2293, "start": 2282, "content": "刑法第320 條第1 項"}, {"end": 2329, "start": 2318, "content": "刑法第325 條第1 項"}, {"end": 2334, "start": 2256, "content": "第3 項"}, {"end": 2405, "start": 2396, "content": "刑法第185 條之4"}]
+    # Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
+    #                 '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
+    #                 '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
+    #                 '山坡地保育利用條例', '公司法', '公民投票法', '公職人員選舉罷免法', 
+    #                 '水土保持法', '水污染防治法', '水利法', '兒童及少年性交易防制條例', 
+    #                 '空氣污染防制法', '金融控股公司法', '律師法', '政府採購法', '毒品危害防制條例',
+    #                 '區域計畫法', '國有財產法', '票券金融管理法', '貪污治罪條例', 
+    #                 '都市計畫法', '期貨交易法', '森林法', '稅捐稽徵法', '農田水利會組織通則',
+    #                 '農會法', '農業金融法', '槍砲彈藥刀械管制條例', '漁會法', '銀行法',
+    #                 '廢棄物清理法', '總統副總統選舉罷免法', '懲治走私條例', '藥事法', '證券交易法', 
+    #                 '資恐防制法', '畜牧法', '破產法', '商標法', '商業登記法', '光碟管理條例',
+    #                 '個人資料保護法', '健康食品管理法', '妨害國幣懲治條例', '通訊保障及監察法',
+    #                 '化粧品衛生管理條例', '金融資產證券化條例', '食品安全衛生管理法',
+    #                 '動物傳染病防治條例', '多層次傳銷管理法', '商業會計法', '信託業法',
+    #                 '電信法', '動物用藥品管理法', '消費者債務清理條例', '專利師法',
+    #                 '傳染病防治法', '嚴重特殊傳染性肺炎防治及紓困振興特別條例',
+    #                 '農藥管理法', '飼料管理法', '管理外匯條例', '野生動物保育法',
+    #                 '植物防疫檢疫法', '遺產及贈與稅法', '電子支付機構管理條例', 
+    #                 '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
+    #                 '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法','刑法']
     
-    file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30daa1cbd1c48dc9763831.txt"
-    with open(file_path,'r',encoding='utf-8') as f:
-        # full_text=json.load(f)
-        full_text=f.read()
-    # CJ_text=full_text["judgement"]
-    CJ_text=full_text
-    # test_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db00cbd1c48dc9787708_1.txt"
-    # f = open(test_path,'w',encoding='utf-8')
-    # f.writelines(full_text["judgement"])
-    # print(CJ_text)
-    Normalized_laws_list=Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
-    print(Normalized_laws_list)
+    # file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30daa1cbd1c48dc9763831.txt"
+    # with open(file_path,'r',encoding='utf-8') as f:
+    #     # full_text=json.load(f)
+    #     full_text=f.read()
+    # # CJ_text=full_text["judgement"]
+    # CJ_text=full_text
+    # # test_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db00cbd1c48dc9787708_1.txt"
+    # # f = open(test_path,'w',encoding='utf-8')
+    # # f.writelines(full_text["judgement"])
+    # # print(CJ_text)
+    # Normalized_laws_list=Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
+    # print(Normalized_laws_list)
+    laws_list=["中華民國刑法第319條第5項第6款","貪污治罪條例第4條第1項第2款","刑法第一百條第十二項第十三款","毒品危害防制條例第一百十二條第五項第六款"]
+    for law in laws_list:
+        print(extract_laws_spa_json(law))
