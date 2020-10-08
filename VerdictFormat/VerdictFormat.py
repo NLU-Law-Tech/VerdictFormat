@@ -93,10 +93,13 @@ def Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list,Break_lin
         # content=re.sub(Break_line,"",strip_blank(content))5
         # 判斷是否有法律名稱跟條是否包含在content
         regex_article="第\d*.*條"
-        laws_name_article_position=re.search(laws_name+regex_article,content)
+        clean_content = re.sub(Break_line, "", strip_blank(content))
+        laws_name_article_position = re.search(laws_name+regex_article, clean_content)
         # 若是沒有，往前找
         if laws_name_article_position==None:
-            content=get_laws_name_and_article(content,start,CJ_text,laws_name+regex_article,Break_line)
+            # content=get_laws_name_and_article(content,start,CJ_text,laws_name+regex_article,Break_line)
+            content = get_laws_name_and_article(
+                content, start, CJ_text, laws_name, Break_line)
         # 資料清洗
         clean_Multilaws=re.sub(Break_line,"",strip_blank(content))
         # 取出第幾條第幾項第幾款,act則用 laws_name代替
@@ -377,7 +380,8 @@ if __name__ == "__main__":
     # response_data = requests.get("http://140.120.13.242:15005/dump_labeled_data")
     # labeled_data=response_data.json()
     # print(Labeled_to_Test(labeled_data))
-  
+    with open("C:/Yao/工研院/Work/data/law_test_marked.json", 'r', encoding='utf-8') as f:
+        full_text=json.load(f)
     # Multilaws_dict_list=[
     #     {"start": 2933, "content": "毒品危害防制條例第11條"},
     #     {"start": 2946, "content": "第13條"},
@@ -385,41 +389,42 @@ if __name__ == "__main__":
     #     {"start": 3315, "content": "貪污治罪條例第11條"},
     #     {"start": 3326, "content": "第133333條第8項\r\n第6款"},
     # ]
+    Multilaws_dict_list=full_text["labeled_data"][0]["laws"]
     # Multilaws_dict_list={"end": 6738, "start": 6728, "content": "刑法第三百三十九條之四"}, {"end": 6889, "start": 6882, "content": "洗錢防制法第二條"}, {"end": 7037, "start": 7029, "content": "洗錢防制法第十四條"}
     # Multilaws_dict_list=[{"end": 2293, "start": 2282, "content": "刑法第320 條第1 項"}, {"end": 2329, "start": 2318, "content": "刑法第325 條第1 項"}, {"end": 2334, "start": 2256, "content": "第3 項"}, {"end": 2405, "start": 2396, "content": "刑法第185 條之4"}]
-    # Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
-    #                 '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
-    #                 '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
-    #                 '山坡地保育利用條例', '公司法', '公民投票法', '公職人員選舉罷免法', 
-    #                 '水土保持法', '水污染防治法', '水利法', '兒童及少年性交易防制條例', 
-    #                 '空氣污染防制法', '金融控股公司法', '律師法', '政府採購法', '毒品危害防制條例',
-    #                 '區域計畫法', '國有財產法', '票券金融管理法', '貪污治罪條例', 
-    #                 '都市計畫法', '期貨交易法', '森林法', '稅捐稽徵法', '農田水利會組織通則',
-    #                 '農會法', '農業金融法', '槍砲彈藥刀械管制條例', '漁會法', '銀行法',
-    #                 '廢棄物清理法', '總統副總統選舉罷免法', '懲治走私條例', '藥事法', '證券交易法', 
-    #                 '資恐防制法', '畜牧法', '破產法', '商標法', '商業登記法', '光碟管理條例',
-    #                 '個人資料保護法', '健康食品管理法', '妨害國幣懲治條例', '通訊保障及監察法',
-    #                 '化粧品衛生管理條例', '金融資產證券化條例', '食品安全衛生管理法',
-    #                 '動物傳染病防治條例', '多層次傳銷管理法', '商業會計法', '信託業法',
-    #                 '電信法', '動物用藥品管理法', '消費者債務清理條例', '專利師法',
-    #                 '傳染病防治法', '嚴重特殊傳染性肺炎防治及紓困振興特別條例',
-    #                 '農藥管理法', '飼料管理法', '管理外匯條例', '野生動物保育法',
-    #                 '植物防疫檢疫法', '遺產及贈與稅法', '電子支付機構管理條例', 
-    #                 '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
-    #                 '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法','刑法']
+    Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
+                    '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
+                    '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
+                    '山坡地保育利用條例', '公司法', '公民投票法', '公職人員選舉罷免法', 
+                    '水土保持法', '水污染防治法', '水利法', '兒童及少年性交易防制條例', 
+                    '空氣污染防制法', '金融控股公司法', '律師法', '政府採購法', '毒品危害防制條例',
+                    '區域計畫法', '國有財產法', '票券金融管理法', '貪污治罪條例', 
+                    '都市計畫法', '期貨交易法', '森林法', '稅捐稽徵法', '農田水利會組織通則',
+                    '農會法', '農業金融法', '槍砲彈藥刀械管制條例', '漁會法', '銀行法',
+                    '廢棄物清理法', '總統副總統選舉罷免法', '懲治走私條例', '藥事法', '證券交易法', 
+                    '資恐防制法', '畜牧法', '破產法', '商標法', '商業登記法', '光碟管理條例',
+                    '個人資料保護法', '健康食品管理法', '妨害國幣懲治條例', '通訊保障及監察法',
+                    '化粧品衛生管理條例', '金融資產證券化條例', '食品安全衛生管理法',
+                    '動物傳染病防治條例', '多層次傳銷管理法', '商業會計法', '信託業法',
+                    '電信法', '動物用藥品管理法', '消費者債務清理條例', '專利師法',
+                    '傳染病防治法', '嚴重特殊傳染性肺炎防治及紓困振興特別條例',
+                    '農藥管理法', '飼料管理法', '管理外匯條例', '野生動物保育法',
+                    '植物防疫檢疫法', '遺產及贈與稅法', '電子支付機構管理條例', 
+                    '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
+                    '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法','刑法']
     
-    # file_path="C:/Yao/ITRI/Work/Project/testing_data/5d30daa1cbd1c48dc9763831.txt"
-    # with open(file_path,'r',encoding='utf-8') as f:
-    #     # full_text=json.load(f)
-    #     full_text=f.read()
-    # # CJ_text=full_text["judgement"]
+    file_path = "C:/Yao/工研院/Work/data/law_test.json"
+    with open(file_path,'r',encoding='utf-8') as f:
+        # full_text=json.load(f)
+        full_text = json.load(f)
+    CJ_text=full_text["full_doc"]
     # CJ_text=full_text
     # # test_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db00cbd1c48dc9787708_1.txt"
     # # f = open(test_path,'w',encoding='utf-8')
     # # f.writelines(full_text["judgement"])
     # # print(CJ_text)
-    # Normalized_laws_list=Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
-    # print(Normalized_laws_list)
-    laws_list=["中華民國刑法第319條第5項第6款","貪污治罪條例第4條第1項第2款","刑法第一百條第十二項第十三款","毒品危害防制條例第一百十二條第五項第六款"]
-    for law in laws_list:
-        print(extract_laws_spa_json(law))
+    Normalized_laws_list=Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
+    print(Normalized_laws_list)
+    # laws_list=["中華民國刑法第319條第5項第6款","貪污治罪條例第4條第1項第2款","刑法第一百條第十二項第十三款","毒品危害防制條例第一百十二條第五項第六款"]
+    # for law in laws_list:
+    #     print(extract_laws_spa_json(law))
