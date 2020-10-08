@@ -1,8 +1,0 @@
-README.md
-setup.py
-VerdictFormat/VerdictFormat.py
-VerdictFormat/__init__.py
-VerdictFormat.egg-info/PKG-INFO
-VerdictFormat.egg-info/SOURCES.txt
-VerdictFormat.egg-info/dependency_links.txt
-VerdictFormat.egg-info/top_level.txt
