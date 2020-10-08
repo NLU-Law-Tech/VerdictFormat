@@ -1,9 +1,9 @@
 # 判決書格式轉換
 ## 使用方法
 安裝套件
-`
-    pip install VerdictFormat
-`
+```sh
+pip install -U git+https://github.com/NLU-Law-Tech/VerdictFormat
+```
 
 把正式格式轉成測試格式
 ```python
