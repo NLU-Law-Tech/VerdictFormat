@@ -97,9 +97,13 @@ def Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list,Break_lin
         laws_name_article_position = re.search(laws_name+regex_article, clean_content)
         # 若是沒有，往前找
         if laws_name_article_position==None:
-            # content=get_laws_name_and_article(content,start,CJ_text,laws_name+regex_article,Break_line)
-            content = get_laws_name_and_article(
-                content, start, CJ_text, laws_name, Break_line)
+            if re.search(regex_article, clean_content)== None:
+                # 如果沒有第X條
+                content=get_laws_name_and_article(content,start,CJ_text,laws_name+regex_article,Break_line)
+            else:
+                # 如果有第X條
+                content = get_laws_name_and_article(
+                    content, start, CJ_text, laws_name, Break_line)
         # 資料清洗
         clean_Multilaws=re.sub(Break_line,"",strip_blank(content))
         # 取出第幾條第幾項第幾款,act則用 laws_name代替
@@ -364,34 +368,12 @@ def add_chinese_one(law):
         return law
 
 if __name__ == "__main__":
-    # Formal_file_path="C:/Yao/ITRI/API (1)/output_v2.json"
-    # Test_file_path="C:/Yao/ITRI/API (1)/Test.json"
-    # Test_to_Formal_path="C:/Yao/ITRI/API (1)/Test_Formal.json"
-    # Formal_to_Test_path="C:/Yao/ITRI/API (1)/Formal_Test.json"
-    # with open(Formal_file_path,'r',encoding='utf-8') as f:
-    #     Formal_format=json.load(f)
-    # with open(Test_file_path,'r',encoding='utf-8') as f:
-    #     Test_format=json.load(f)
-    # print(Formal_format)
-    # print(Test_format)
-    # Test_to_Formal(Test_format,Test_to_Formal_path)
-    # Formal_to_Test(Formal_format,Formal_to_Test_path)
-
-    # response_data = requests.get("http://140.120.13.242:15005/dump_labeled_data")
-    # labeled_data=response_data.json()
-    # print(Labeled_to_Test(labeled_data))
-    with open("C:/Yao/工研院/Work/data/law_test_marked.json", 'r', encoding='utf-8') as f:
+    file_path = "C:/Yao/工研院/Work/data/刑事判決_96,重訴,16_2008-03-06.json"
+    # file_path = "C:/Yao/工研院/Work/data/law_test_marked.json"
+    with open(file_path, 'r', encoding='utf-8') as f:
         full_text=json.load(f)
-    # Multilaws_dict_list=[
-    #     {"start": 2933, "content": "毒品危害防制條例第11條"},
-    #     {"start": 2946, "content": "第13條"},
-    #     {"start": 2951, "content": "第15\r\n條"},
-    #     {"start": 3315, "content": "貪污治罪條例第11條"},
-    #     {"start": 3326, "content": "第133333條第8項\r\n第6款"},
-    # ]
+    CJ_text = full_text["full_doc"]
     Multilaws_dict_list=full_text["labeled_data"][0]["laws"]
-    # Multilaws_dict_list={"end": 6738, "start": 6728, "content": "刑法第三百三十九條之四"}, {"end": 6889, "start": 6882, "content": "洗錢防制法第二條"}, {"end": 7037, "start": 7029, "content": "洗錢防制法第十四條"}
-    # Multilaws_dict_list=[{"end": 2293, "start": 2282, "content": "刑法第320 條第1 項"}, {"end": 2329, "start": 2318, "content": "刑法第325 條第1 項"}, {"end": 2334, "start": 2256, "content": "第3 項"}, {"end": 2405, "start": 2396, "content": "刑法第185 條之4"}]
     Match_laws_list=['中華民國刑法', '陸海空軍刑法', '國家機密保護法', '國家情報工作法', 
                     '國家安全法', '洗錢防制法', '臺灣地區與大陸地區人民關係條例', '貿易法', 
                     '組織犯罪防制條例', '人口販運防制法', '社會秩序維護法', '戰略性高科技貨品輸出入管理辦法', 
@@ -413,18 +395,6 @@ if __name__ == "__main__":
                     '電子票證發行管理條例', '營業秘密法', '信用合作社法', '菸酒管理法', 
                     '保險法', '證券投資信託及顧問法', '證券投資人及期貨交易人保護法','刑法']
     
-    file_path = "C:/Yao/工研院/Work/data/law_test.json"
-    with open(file_path,'r',encoding='utf-8') as f:
-        # full_text=json.load(f)
-        full_text = json.load(f)
-    CJ_text=full_text["full_doc"]
-    # CJ_text=full_text
-    # # test_path="C:/Yao/ITRI/Work/Project/testing_data/5d30db00cbd1c48dc9787708_1.txt"
-    # # f = open(test_path,'w',encoding='utf-8')
-    # # f.writelines(full_text["judgement"])
-    # # print(CJ_text)
     Normalized_laws_list=Multilaws_to_Normalize(CJ_text,Match_laws_list,Multilaws_dict_list)
     print(Normalized_laws_list)
-    # laws_list=["中華民國刑法第319條第5項第6款","貪污治罪條例第4條第1項第2款","刑法第一百條第十二項第十三款","毒品危害防制條例第一百十二條第五項第六款"]
-    # for law in laws_list:
-    #     print(extract_laws_spa_json(law))
+   
